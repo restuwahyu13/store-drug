@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsNumberString, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class RecipeParamsDTO {
   @IsNumberString()
@@ -31,4 +31,10 @@ export class RecipeDrugsBodyDTO {
   @IsNotEmpty()
   @IsArray()
   products: Record<string, any>[];
+}
+
+export class RecipeDrugsStatusBodyDTO {
+  @IsNotEmpty()
+  @IsEnum(['confirmed', 'cancelled'])
+  status: string;
 }

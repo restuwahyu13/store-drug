@@ -1,10 +1,9 @@
 require('dotenv/config');
 const path = require('path');
 
-const pathEntitiesDir = !['production', 'staging'].includes(process.env.NODE_ENV) ? 'src/models' : 'dist/models';
-const pathMigrationDir = !['production', 'staging'].includes(process.env.NODE_ENV) ? 'src/databases/migrations' : 'dist/databases/migrations';
-const pathSeedDir = !['production', 'staging'].includes(process.env.NODE_ENV) ? 'src/databases/seeds' : 'dist/databases/seeds';
-const pathFactoryDir = !['production', 'staging'].includes(process.env.NODE_ENV) ? 'src/databases/factories' : 'dist/databases/factories';
+const pathEntitiesDir = ['development'].includes(process.env.NODE_ENV) ? 'src/models' : 'dist/models';
+const pathMigrationDir = ['development'].includes(process.env.NODE_ENV) ? 'src/databases/migrations' : 'dist/databases/migrations';
+const pathSeedDir = ['development'].includes(process.env.NODE_ENV) ? 'src/databases/seeds' : 'dist/databases/seeds';
 
 const entitiesDir = path.resolve(process.cwd(), pathEntitiesDir);
 const migrationsDir = path.resolve(process.cwd(), pathMigrationDir);

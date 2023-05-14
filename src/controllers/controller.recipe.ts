@@ -4,7 +4,7 @@ import { OutgoingMessage } from 'http';
 
 import { ApiResponse, apiResponse } from '@helpers/helper.apiResponse';
 import { RecipeService } from '@services/service.recipe';
-import { RecipeBodyDTO, RecipeDrugsBodyDTO, RecipeDrugsParamsDTO, RecipeParamsDTO } from '@dtos/dto.recipe';
+import { RecipeBodyDTO, RecipeDrugsBodyDTO, RecipeDrugsParamsDTO, RecipeDrugsStatusBodyDTO, RecipeParamsDTO } from '@dtos/dto.recipe';
 
 @Controller('recipe')
 export class RecipeController {
@@ -50,13 +50,13 @@ export class RecipeController {
     }
   }
 
-  // @Put(':recipeId/user/:userId')
-  // async updateRecipeById(@Req() req: Request, @Res() res: Response): Promise<OutgoingMessage> {
-  //   try {
-  //     const service: ApiResponse = await this.recipeService.createRecipe(req.body);
-  //     return res.status(service.stat_code).json(apiResponse(service));
-  //   } catch (e: any) {
-  //     return res.status(e.stat_code).json(apiResponse(e));
-  //   }
-  // }
+  @Put(':recipeId/user/:userId/status')
+  async updateRecipeStatusById(@Req() req: Request, @Res() res: Response, @Param() params: RecipeDrugsParamsDTO, @Body() body: RecipeDrugsStatusBodyDTO): Promise<OutgoingMessage> {
+    try {
+      const service: ApiResponse = await this.recipeService.updateRecipeStatusById(params, body);
+      return res.status(service.stat_code).json(apiResponse(service));
+    } catch (e: any) {
+      return res.status(e.stat_code).json(apiResponse(e));
+    }
+  }
 }

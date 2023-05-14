@@ -9,7 +9,7 @@ import { Product } from '@models/model.product';
 import { RecipeDetail } from '@models/model.recipeDetail';
 import { Doctor } from '@models/model.doctor';
 import { ApiResponse, apiResponse } from '@helpers/helper.apiResponse';
-import { RecipeBodyDTO, RecipeDrugsBodyDTO, RecipeDrugsParamsDTO, RecipeParamsDTO } from '@dtos/dto.recipe';
+import { RecipeBodyDTO, RecipeDrugsBodyDTO, RecipeDrugsParamsDTO, RecipeDrugsStatusBodyDTO, RecipeParamsDTO } from '@dtos/dto.recipe';
 import { countDuplicate } from '@helpers/helper.countDuplicate';
 import { Clinic } from '@models/model.clinic';
 
@@ -30,7 +30,7 @@ export class RecipeService {
       const [checkUser, checkDoctor, checkClinic]: [User, Doctor, Clinic] = await Promise.all([
         this.user.findOne({ where: { id: +params.userId, deleted_at: null }, select: ['id'] }),
         this.doctor.findOne({ where: { name: body.doctorName, deleted_at: null }, select: ['id', 'name'] }),
-        this.clinic.findOne({ where: { name: body.clinicName }, select: ['id', 'name'] }),
+        this.clinic.findOne({ where: { name: body.clinicName, deleted_at: null }, select: ['id', 'name'] }),
       ]);
 
       if (!checkUser) throw apiResponse({ stat_code: status.NOT_FOUND, stat_message: 'User not found' });
@@ -61,7 +61,10 @@ export class RecipeService {
 
   async createRecipeDrugs(params: RecipeDrugsParamsDTO, body: RecipeDrugsBodyDTO): Promise<ApiResponse> {
     try {
-      const [checkUser, checkRecipe]: [User, Recipe] = await Promise.all([this.user.findOne({ where: { id: params.userId } }), this.recipe.findOne({ where: { id: params.recipeId, user_id: params.userId, status: 'created' } })]);
+      const [checkUser, checkRecipe]: [User, Recipe] = await Promise.all([
+        this.user.findOne({ where: { id: params.userId } }),
+        this.recipe.findOne({ where: { id: params.recipeId, user_id: params.userId, status: 'created' } }),
+      ]);
 
       if (!checkUser) apiResponse({ stat_code: status.NOT_FOUND, stat_message: 'User not found' });
       if (!checkRecipe) apiResponse({ stat_code: status.NOT_FOUND, stat_message: 'Recipe not found' });
@@ -96,7 +99,7 @@ export class RecipeService {
           if (!createPurchase) throw apiResponse({ stat_code: status.FORBIDDEN, err_message: 'Add drugs to recipe failed' });
         });
       } else {
-        return await new Promise(async (resolve, reject) => {
+        return await new Promise<ApiResponse>(async (resolve, reject) => {
           body.products.forEach(async (val: Record<string, any>) => {
             try {
               const [getProduct, getPurchaseProduct]: [Product, Purchase] = await Promise.all([
@@ -137,7 +140,11 @@ export class RecipeService {
             }
           });
 
-          const calculateBalance: Record<string, any> = await this.purchase.createQueryBuilder('pc').select('SUM(pc.total_price) as price').where('pc.recipe_id = :recipeId', { recipeId: +params.recipeId }).getRawOne();
+          const calculateBalance: Record<string, any> = await this.purchase
+            .createQueryBuilder('pc')
+            .select('SUM(pc.total_price) as price')
+            .where('pc.recipe_id = :recipeId', { recipeId: +params.recipeId })
+            .getRawOne();
           if (!calculateBalance) reject(apiResponse({ stat_code: status.UNPROCESSABLE_ENTITY, err_message: 'Calculate balance failed' }));
 
           const updateTotalbalance: UpdateResult = await this.recipe.update({ id: +params.recipeId }, { total_price: calculateBalance.price });
@@ -154,7 +161,7 @@ export class RecipeService {
     }
   }
 
-  async listRecipe(params: RecipeParamsDTO) {
+  async listRecipe(params: RecipeParamsDTO): Promise<ApiResponse> {
     try {
       const listRecipe = await this.recipe.find({ where: { user_id: +params.userId }, relations: ['user'] });
       if (!listRecipe.length) throw apiResponse({ stat_code: status.OK, stat_message: 'Recipe success', data: listRecipe });
@@ -175,8 +182,11 @@ export class RecipeService {
     }
   }
 
-  async listRecipeById(params: RecipeDrugsParamsDTO) {
-    const detailRecipe: Record<string, any> = await this.recipe.findOne({ where: { id: +params.recipeId, user_id: +params.userId }, relations: ['user', 'recipeDetail', 'purchases', 'purchases.product'] });
+  async listRecipeById(params: RecipeDrugsParamsDTO): Promise<ApiResponse> {
+    const detailRecipe: Record<string, any> = await this.recipe.findOne({
+      where: { id: +params.recipeId, user_id: +params.userId },
+      relations: ['user', 'recipeDetail', 'purchases', 'purchases.product'],
+    });
     if (!detailRecipe) throw apiResponse({ stat_code: status.OK, stat_message: 'Recipe success' });
 
     const purchasesDrug: Record<string, any>[] = detailRecipe.purchases.map((val: Record<string, any>) => ({
@@ -208,5 +218,68 @@ export class RecipeService {
   catch(e: any) {
     if (e instanceof Error) return apiResponse({ stat_code: status.UNPROCESSABLE_ENTITY, err_message: e.message });
     else return apiResponse(e);
+  }
+
+  async updateRecipeStatusById(params: RecipeDrugsParamsDTO, body: RecipeDrugsStatusBodyDTO): Promise<ApiResponse> {
+    try {
+      const detailRecipe: Record<string, any> = await this.recipe.findOne({ where: { id: +params.recipeId, user_id: +params.userId }, relations: ['purchases', 'purchases.product'] });
+
+      if (!detailRecipe) throw apiResponse({ stat_code: status.NOT_FOUND, stat_message: 'Recipe not found' });
+      else if (detailRecipe.updated_at) throw apiResponse({ stat_code: status.FORBIDDEN, stat_message: 'Confirmed | Cancelled recipe recjected' });
+
+      return new Promise<ApiResponse>((resolve, reject) => {
+        detailRecipe.purchases.forEach(async (val: Record<string, any>): Promise<void> => {
+          try {
+            let statusRecipe: string = '';
+
+            const getProduct: Product = await this.product.findOne({ id: val.id }, { select: ['id', 'stock', 'name'] });
+            if (!getProduct) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Product not found' });
+
+            if (body.status == 'confirmed') {
+              if (detailRecipe && detailRecipe.status != 'created') throw apiResponse({ stat_code: status.FORBIDDEN, err_message: "Can't confirmed recipe" });
+              let subtractStock: number = 0;
+
+              if (getProduct.name == val.product.name) {
+                subtractStock = getProduct.stock - val.qty;
+              }
+
+              const [updateRecipeStatus, updateProductStock]: [UpdateResult, UpdateResult] = await Promise.all([
+                this.recipe.update({ id: detailRecipe.id }, { status: 'confirmed', updated_at: new Date() }),
+                this.product.update({ id: getProduct.id }, { stock: subtractStock, updated_at: new Date() }),
+              ]);
+
+              if (!updateRecipeStatus) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Confirmed recipe failed' });
+              if (!updateProductStock) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Deducted stock failed' });
+
+              statusRecipe = 'Confirmed';
+            } else {
+              if (detailRecipe && detailRecipe.status != 'confirmed') throw apiResponse({ stat_code: status.FORBIDDEN, err_message: "Can't cancelled recipe" });
+              let additionStock: number = 0;
+
+              if (getProduct.name == val.product.name) {
+                additionStock = getProduct.stock + val.qty;
+              }
+
+              const [updateRecipeStatus, updateProductStock]: [UpdateResult, UpdateResult] = await Promise.all([
+                this.recipe.update({ id: detailRecipe.id }, { status: 'cancelled' }),
+                this.product.update({ id: getProduct.id }, { stock: additionStock, updated_at: new Date() }),
+              ]);
+
+              if (!updateRecipeStatus) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Cancelled recipe failed' });
+              if (!updateProductStock) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Addition stock failed' });
+
+              statusRecipe = 'Cancelled';
+            }
+
+            resolve(apiResponse({ stat_code: status.OK, stat_message: `${statusRecipe} recipe success` }));
+          } catch (e: any) {
+            reject(e);
+          }
+        });
+      });
+    } catch (e: any) {
+      if (e instanceof Error) return apiResponse({ stat_code: status.UNPROCESSABLE_ENTITY, err_message: e.message });
+      else return apiResponse(e);
+    }
   }
 }

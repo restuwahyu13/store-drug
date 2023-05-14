@@ -7,4 +7,5 @@ export interface IRecipe {
   status: string;
   total_price?: number;
   created_at?: Date;
+  updated_at?: Date;
 }

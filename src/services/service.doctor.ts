@@ -24,12 +24,23 @@ export class DoctorService {
 
       let recipesCache: RecipeDetail[] = [];
       const existRecipesCache: number = await this.redisService.hkeyCacheDataExist('cache', 'recipeDoctor');
-      const countRecipes: number = await this.recipeDetail.count({ select: ['id'] });
+      const countRecipes: number = await this.recipeDetail.count({ where: { recipe: { status: 'confirmed' } }, relations: ['recipe', 'recipe.user'] });
 
       if (!existRecipesCache) {
         const [recipes, allRecipes]: [RecipeDetail[], RecipeDetail[]] = await Promise.all([
-          this.recipeDetail.find({ where: { doctor_id: +params.id }, take: query.limit, skip: query.page, order: { id: 'DESC' }, relations: ['recipe', 'recipe.user'] }),
-          this.recipeDetail.find({ where: { doctor_id: +params.id }, take: +process.env.CACHE_LIMIT_DATA, order: { id: 'DESC' }, relations: ['recipe', 'recipe.user'] }),
+          this.recipeDetail.find({
+            where: { doctor_id: +params.id, recipe: { status: 'confirmed' } },
+            take: query.limit,
+            skip: query.page,
+            order: { id: 'DESC' },
+            relations: ['recipe', 'recipe.user'],
+          }),
+          this.recipeDetail.find({
+            where: { doctor_id: +params.id, recipe: { status: 'confirmed' } },
+            take: +process.env.CACHE_LIMIT_DATA,
+            order: { id: 'DESC' },
+            relations: ['recipe', 'recipe.user'],
+          }),
         ]);
 
         if (!recipes.length || !allRecipes.length) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Recipe not found' });
@@ -72,7 +83,7 @@ export class DoctorService {
   async listProductById(params: DoctorRecipeParamsDTO): Promise<ApiResponse> {
     try {
       const recipeDetail: Record<string, any> = await this.recipeDetail.findOne({
-        where: { doctor_id: +params.id },
+        where: { doctor_id: +params.id, recipe: { status: 'confirmed' } },
         order: { id: 'DESC' },
         relations: ['recipe', 'recipe.user', 'recipe.purchases', 'recipe.purchases.product'],
       });
@@ -110,8 +121,14 @@ export class DoctorService {
 
   async updateProductById(params: DoctorRecipeParamsDTO, body: DoctorRecipeBodyDTO): Promise<ApiResponse> {
     try {
-      const checkRecipeDetail = await this.recipeDetail.findOne({ where: { id: params.recipeId, doctor_id: params.id }, select: ['id'] });
+      const checkRecipeDetail: RecipeDetail = await this.recipeDetail.findOne({
+        where: { id: params.recipeId, doctor_id: params.id },
+        relations: ['recipe'],
+        select: ['id'],
+      });
+
       if (!checkRecipeDetail) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Recipe not found' });
+      else if (checkRecipeDetail.recipe.status == 'confirmed' && checkRecipeDetail.recipe.updated_at) throw apiResponse({ stat_code: status.FORBIDDEN, err_message: "Can't add recipe detail" });
 
       const updateRecipeDetail: UpdateResult = await this.recipeDetail.update({ id: checkRecipeDetail.id }, { medication_guide: body.medicalGuide, notes: body.notes });
       if (!updateRecipeDetail) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Recipe not found' });

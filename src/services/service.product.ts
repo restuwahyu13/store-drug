@@ -101,7 +101,7 @@ export class ProductService {
   async listProductById(params: ProductParamsDTO): Promise<ApiResponse> {
     try {
       const product: Product = await this.product.findOne({ where: { id: params.id, deleted_at: null } });
-      if (!product) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Product not exist' });
+      if (!product) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Product not found' });
 
       return apiResponse({ stat_code: status.OK, stat_message: 'Product success', data: product });
     } catch (e: any) {
@@ -113,7 +113,7 @@ export class ProductService {
   async deleteProductById(params: ProductParamsDTO): Promise<ApiResponse> {
     try {
       const checkProduct = await this.product.findOne({ where: { id: params.id, deleted_at: null }, select: ['id'] });
-      if (!checkProduct) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Product not exist' });
+      if (!checkProduct) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Product not found' });
 
       const deleteProduct = await this.product.update({ ...checkProduct }, { deleted_at: new Date() });
       if (!deleteProduct) throw apiResponse({ stat_code: status.FORBIDDEN, err_message: 'Deleted product failed' });
@@ -128,7 +128,7 @@ export class ProductService {
   async updateProductById(params: ProductParamsDTO, body: ProductBodyDTO): Promise<ApiResponse> {
     try {
       const checkProduct = await this.product.findOne({ where: { id: params.id, deleted_at: null }, select: ['id'] });
-      if (!checkProduct) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Product not exist' });
+      if (!checkProduct) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Product not found' });
 
       const updateProduct = await this.product.update({ ...checkProduct }, body);
       if (!updateProduct) throw apiResponse({ stat_code: status.FORBIDDEN, err_message: 'Updated product failed' });
