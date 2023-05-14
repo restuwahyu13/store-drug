@@ -8,11 +8,13 @@ import { DoctorParamsDTO, DoctorQueryDTO, DoctorRecipeBodyDTO, DoctorRecipeParam
 import { RecipeDetail } from '@models/model.recipeDetail';
 import { Doctor } from '@models/model.doctor';
 import { Clinic } from '@models/model.clinic';
+import { Recipe } from '@models/model.recipe';
 
 @Injectable()
 export class DoctorService {
   constructor(
     @InjectRepository(RecipeDetail) private readonly recipeDetail: Repository<RecipeDetail>,
+    @InjectRepository(Recipe) private readonly recipe: Repository<Recipe>,
     @InjectRepository(Doctor) private readonly doctor: Repository<Doctor>,
     @InjectRepository(Clinic) private readonly clinic: Repository<Clinic>,
     private readonly redisService: RedisService,
@@ -135,10 +137,14 @@ export class DoctorService {
       });
 
       if (!checkRecipeDetail) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Recipe not found' });
-      else if (checkRecipeDetail.recipe.status != 'confirmed') throw apiResponse({ stat_code: status.FORBIDDEN, err_message: "Can't add recipe detail" });
+      else if (checkRecipeDetail.recipe.status != 'confirmed') throw apiResponse({ stat_code: status.FORBIDDEN, err_message: "Can't add recipe detail, status must be confirmed" });
+      else if (checkRecipeDetail.recipe.updated_at != undefined) throw apiResponse({ stat_code: status.FORBIDDEN, err_message: "Can't add recipe detail, latest status confirmed" });
 
       const updateRecipeDetail: UpdateResult = await this.recipeDetail.update({ id: checkRecipeDetail.id }, { medication_guide: body.medicalGuide, notes: body.notes });
-      if (!updateRecipeDetail) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Recipe not found' });
+      if (!updateRecipeDetail) throw apiResponse({ stat_code: status.FORBIDDEN, err_message: 'Updated recipe detail failed' });
+
+      const updateRecipe: UpdateResult = await this.recipe.update({ id: checkRecipeDetail.recipe.id, recipe_detail_id: checkRecipeDetail.id }, { updated_at: new Date() });
+      if (!updateRecipe) throw apiResponse({ stat_code: status.FORBIDDEN, err_message: 'Updated recipe detail failed' });
 
       return apiResponse({ stat_code: status.OK, stat_message: 'Updated recipe detail success' });
     } catch (e: any) {

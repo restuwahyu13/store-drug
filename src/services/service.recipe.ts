@@ -245,7 +245,7 @@ export class RecipeService {
               }
 
               const [updateRecipeStatus, updateProductStock]: [UpdateResult, UpdateResult] = await Promise.all([
-                this.recipe.update({ id: detailRecipe.id }, { status: 'confirmed', updated_at: new Date() }),
+                this.recipe.update({ id: detailRecipe.id }, { status: 'confirmed' }),
                 this.product.update({ id: getProduct.id }, { stock: subtractStock, updated_at: new Date() }),
               ]);
 
