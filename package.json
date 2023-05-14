@@ -1,0 +1,109 @@
+{
+  "name": "lifepack-node",
+  "version": "0.0.1",
+  "description": "Lifepack technical test node.js version",
+  "author": {
+    "name": "Restu Wahyu Saputra",
+    "email": "restuwahyyu13@gmail.com",
+    "url": "https://github.com/restuwahyu13"
+  },
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "cross-env NODE_ENV=development nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "mig:rollback": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop",
+    "mig:latest": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run",
+    "mig:list": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:show",
+    "mig:make": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create --name",
+    "seed:config": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register ./node_modules/typeorm-seeding/dist/cli config",
+    "seed:run": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register ./node_modules/typeorm-seeding/dist/cli seed"
+  },
+  "dependencies": {
+    "@nestjs/common": "^8.4.7",
+    "@nestjs/config": "^2.3.1",
+    "@nestjs/core": "^8.4.7",
+    "@nestjs/platform-express": "^8.4.7",
+    "@nestjs/typeorm": "^8.1.4",
+    "body-parser": "^1.20.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "dotenv": "^16.0.3",
+    "helmet": "^6.1.5",
+    "hpp": "^0.2.3",
+    "ioredis": "^5.3.2",
+    "omit-empty": "^1.0.0",
+    "pg": "^8.7.3",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0",
+    "typeorm": "^0.2.24",
+    "validator": "^13.9.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.0.0",
+    "@nestjs/cli": "^8.2.8",
+    "@nestjs/schematics": "^8.0.11",
+    "@nestjs/testing": "^8.4.7",
+    "@types/bcrypt": "^5.0.0",
+    "@types/body-parser": "^1.19.2",
+    "@types/express": "^4.17.17",
+    "@types/hpp": "^0.2.2",
+    "@types/ioredis": "^5.0.0",
+    "@types/jest": "29.5.0",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/node": "^18.15.11",
+    "@types/omit-empty": "^1.0.1",
+    "@types/rimraf": "^4.0.5",
+    "@types/supertest": "^2.0.12",
+    "@types/validator": "^13.7.17",
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.38.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "29.5.0",
+    "prettier": "^2.8.7",
+    "rimraf": "^5.0.0",
+    "source-map-support": "^0.5.21",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.1.0",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.4.0",
+    "tsconfig-paths": "^4.2.0",
+    "tslib": "^2.5.0",
+    "typeorm-seeding": "^1.6.1",
+    "typescript": "^4.6.2"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  },
+  "engines": {
+    "node": ">= 14.x.x",
+    "npm": ">= 6.x.x"
+  }
+}
