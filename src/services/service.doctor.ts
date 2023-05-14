@@ -135,7 +135,7 @@ export class DoctorService {
       });
 
       if (!checkRecipeDetail) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Recipe not found' });
-      else if (checkRecipeDetail.recipe.status == 'confirmed' && checkRecipeDetail.recipe.updated_at) throw apiResponse({ stat_code: status.FORBIDDEN, err_message: "Can't add recipe detail" });
+      else if (checkRecipeDetail.recipe.status != 'confirmed') throw apiResponse({ stat_code: status.FORBIDDEN, err_message: "Can't add recipe detail" });
 
       const updateRecipeDetail: UpdateResult = await this.recipeDetail.update({ id: checkRecipeDetail.id }, { medication_guide: body.medicalGuide, notes: body.notes });
       if (!updateRecipeDetail) throw apiResponse({ stat_code: status.NOT_FOUND, err_message: 'Recipe not found' });

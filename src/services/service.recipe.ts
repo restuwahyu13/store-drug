@@ -208,7 +208,8 @@ export class RecipeService {
       status: detailRecipe.status,
       paidAmount: +detailRecipe.total_price,
       recipedetail: {
-        medicalGuide: detailRecipe.recipeDetail.medication_guide, // medical guide can't exist, after doctor add this
+        medicalGuide: detailRecipe.recipeDetail.medication_guide, // medical guide can't exist, after doctor add this,
+        notes: detailRecipe.recipeDetail.notes,
       },
       drug: purchasesDrug,
     };
