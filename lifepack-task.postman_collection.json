@@ -1,0 +1,497 @@
+{
+	"info": {
+		"_postman_id": "ee934878-0cc9-494b-bd31-a955c3e51be8",
+		"name": "lifepack-task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5474931"
+	},
+	"item": [
+		{
+			"name": "product",
+			"item": [
+				{
+					"name": "Create product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"combatrin\",\n\t\"category\": \"sirup\",\n\t\"price\": \"25000\",\n\t\"stock\": \"20\",\n\t\"margin\": false,\n\t\"tax\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api}}/product",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"product"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "dulcolax",
+									"disabled": true
+								},
+								{
+									"key": "sku",
+									"value": "SKU003",
+									"disabled": true
+								},
+								{
+									"key": "stock",
+									"value": "15",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}/product?limit=10&page=1",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"product"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "name",
+									"value": "dulcolax",
+									"disabled": true
+								},
+								{
+									"key": "sku",
+									"value": "SKU003",
+									"disabled": true
+								},
+								{
+									"key": "stock",
+									"value": "15",
+									"disabled": true
+								},
+								{
+									"key": "margin",
+									"value": "true",
+									"disabled": true
+								},
+								{
+									"key": "tax",
+									"value": "true",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detail product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}/product/17",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"product",
+								"17"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api}}/product/17",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"product",
+								"17"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update product",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"combatrin\",\n\t\"category\": \"sirup\",\n\t\"price\": \"25000\",\n\t\"stock\": \"50\",\n\t\"margin\": true,\n\t\"tax\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api}}/product/17",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"product",
+								"17"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "dulcolax",
+									"disabled": true
+								},
+								{
+									"key": "sku",
+									"value": "SKU003",
+									"disabled": true
+								},
+								{
+									"key": "stock",
+									"value": "15",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "recipe doctor",
+			"item": [
+				{
+					"name": "List recipe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}/doctor/{{doctorId}}/recipe?limit=10&page=1",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"doctor",
+								"{{doctorId}}",
+								"recipe"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detail recipe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}/doctor/{{doctorId}}/recipe/{{recipeId}}?limit=10&page=1",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"doctor",
+								"{{doctorId}}",
+								"recipe",
+								"{{recipeId}}"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update recipe",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"medicalGuide\": [\n\t\t{\n\t\t\t\"drug\": \"panadol\",\n\t\t\t\"dosis\": \"3x sehari\"\n\t\t},\n\t\t{\n\t\t\t\"drug\": \"bodrex\",\n\t\t\t\"dosis\": \"1x sehari\"\n\t\t}\n\t],\n\t\"notes\": \"Semoga lekas sembuh pelanggan\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api}}/doctor/{{doctorId}}/recipe/{{recipeDetailId}}",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"doctor",
+								"{{doctorId}}",
+								"recipe",
+								"{{recipeDetailId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "recipe user",
+			"item": [
+				{
+					"name": "Create recipe",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var resData = JSON.parse(responseBody)",
+									"",
+									"if(resData) {",
+									"\tpm.environment.set(\"recipeId\", resData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"doctorName\": \"Christina Bosco Jr.\",\n\t\"clinicName\": \"Amanah Keluarga Medical\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api}}/recipe/user/{{userId}}",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"recipe",
+								"user",
+								"{{userId}}"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "dulcolax",
+									"disabled": true
+								},
+								{
+									"key": "sku",
+									"value": "SKU003",
+									"disabled": true
+								},
+								{
+									"key": "stock",
+									"value": "15",
+									"disabled": true
+								},
+								{
+									"key": "margin",
+									"value": "false",
+									"disabled": true
+								},
+								{
+									"key": "tax",
+									"value": "false",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add recipe drugs",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"products\": [\n\t\t{\n\t\t\t\"id\": 1,\n\t\t\t\"qty\": 2\n\t\t},\n\t\t{\n\t\t\t\"id\": 2,\n\t\t\t\"qty\": 2\n\t\t}\n\t]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api}}/recipe/{{recipeId}}/user/{{userId}}",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"recipe",
+								"{{recipeId}}",
+								"user",
+								"{{userId}}"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "dulcolax",
+									"disabled": true
+								},
+								{
+									"key": "sku",
+									"value": "SKU003",
+									"disabled": true
+								},
+								{
+									"key": "stock",
+									"value": "15",
+									"disabled": true
+								},
+								{
+									"key": "margin",
+									"value": "false",
+									"disabled": true
+								},
+								{
+									"key": "tax",
+									"value": "false",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update status recipe",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"status\": \"confirmed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api}}/recipe/{{recipeId}}/user/{{userId}}/status",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"recipe",
+								"{{recipeId}}",
+								"user",
+								"{{userId}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recipe list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}/recipe/user/{{userId}}",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"recipe",
+								"user",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recipe detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}/recipe/{{recipeId}}/user/{{userId}}",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"recipe",
+								"{{recipeId}}",
+								"user",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api}}",
+					"host": [
+						"{{api}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
