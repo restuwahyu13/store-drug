@@ -39,4 +39,24 @@ export class DoctorController {
       return res.status(e.stat_code).json(apiResponse(e));
     }
   }
+
+  @Get()
+  async listDoctor(@Req() req: Request, @Res() res: Response, @Query() query: DoctorQueryDTO): Promise<OutgoingMessage> {
+    try {
+      const service: ApiResponse = await this.doctorService.listDoctor(query);
+      return res.status(service.stat_code).json(apiResponse(service));
+    } catch (e: any) {
+      return res.status(e.stat_code).json(apiResponse(e));
+    }
+  }
+
+  @Get('clinic')
+  async listClinic(@Req() req: Request, @Res() res: Response, @Query() query: DoctorQueryDTO): Promise<OutgoingMessage> {
+    try {
+      const service: ApiResponse = await this.doctorService.listClinic(query);
+      return res.status(service.stat_code).json(apiResponse(service));
+    } catch (e: any) {
+      return res.status(e.stat_code).json(apiResponse(e));
+    }
+  }
 }

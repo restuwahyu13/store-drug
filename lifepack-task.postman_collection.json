@@ -280,6 +280,66 @@
 			]
 		},
 		{
+			"name": "doctor & clinic",
+			"item": [
+				{
+					"name": "List doctor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}/doctor?limit=2&page=1",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"doctor"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List clinic",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}/doctor/clinic?limit=3&page=1",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"doctor",
+								"clinic"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "3"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "recipe user",
 			"item": [
 				{
